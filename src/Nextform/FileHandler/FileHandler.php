@@ -77,9 +77,18 @@ class FileHandler
      * @param array $data
      * @return boolean
      */
+    public function isActive($data)
+    {
+        return array_key_exists(self::FILE_TRIGGER_NAME, $data);
+    }
+
+    /**
+     * @param array $data
+     * @return boolean
+     */
     public function handle(&$data)
     {
-        if (array_key_exists(self::FILE_TRIGGER_NAME, $data)) {
+        if ($this->isActive($data)) {
             $data = $this->proccessData($data);
         }
 
