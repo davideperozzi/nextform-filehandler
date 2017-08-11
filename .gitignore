@@ -1,0 +1,8 @@
+/vendor/
+/tests/assets/temp/nextform_*
+.php_cs.cache
+.idea
+.phpintel
+.DS_Store
+composer.lock
+cghooks.lock

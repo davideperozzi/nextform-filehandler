@@ -1,0 +1,38 @@
+{
+    "name": "davideperozzi/nextform-filehandler",
+    "description": "File handler for the nextform php library",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Davide Perozzi",
+            "email": "davide@dorfjungs.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Nextform\\FileHandler\\": "src/Nextform/FileHandler"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~5.7",
+        "friendsofphp/php-cs-fixer": "^2.4",
+        "brainmaestro/composer-git-hooks": "^2.2",
+        "davideperozzi/nextform-renderer": "^1.0"
+    },
+     "extra": {
+        "hooks": {
+            "pre-commit": "php ./vendor/bin/php-cs-fixer fix --verbose",
+            "post-commit": "php ./vendor/bin/phpunit"
+        }
+    },
+    "scripts": {
+        "post-install-cmd": "php ./vendor/bin/cghooks add --ignore-lock",
+        "post-update-cmd": "php ./vendor/bin/cghooks update"
+    },
+    "require": {
+        "davideperozzi/nextform-config": "^1.0",
+        "davideperozzi/nextform-validator": "^1.0",
+        "davideperozzi/nextform-helpers": "^1.0"
+    }
+}

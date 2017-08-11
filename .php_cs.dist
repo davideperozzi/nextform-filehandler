@@ -1,0 +1,45 @@
+<?php
+
+$finder = PhpCsFixer\Finder::create()
+    ->in(__DIR__);
+
+$config = PhpCsFixer\Config::create();
+$config->setRules([
+        '@PSR2' => true,
+        'no_multiline_whitespace_around_double_arrow' => true,
+        'ordered_imports' => ['sortAlgorithm' => 'alpha'],
+        'no_trailing_comma_in_singleline_array' => true,
+        'no_whitespace_before_comma_in_array' => true,
+        'no_blank_lines_after_class_opening' => true,
+        'no_trailing_whitespace_in_comment' => true,
+        'no_leading_namespace_whitespace' => true,
+        'no_trailing_comma_in_list_call' => true,
+        'no_spaces_after_function_name' => true,
+        'no_spaces_inside_parenthesis' => true,
+        'array_syntax' => ['syntax' => 'short'],
+        'no_whitespace_in_blank_line' => true,
+        'linebreak_after_opening_tag' => true,
+        'single_line_comment_style' => true,
+        'not_operator_with_space' => true,
+        'no_leading_import_slash' => true,
+        'no_trailing_whitespace' => true,
+        'normalize_index_brace' => true,
+        'visibility_required' => true,
+        'no_mixed_echo_print' => true,
+        'no_empty_statement' => true,
+        'no_short_bool_cast' => true,
+        'no_unused_imports' => true,
+        'no_useless_return' => true,
+        'no_empty_comment' => true,
+        'no_empty_phpdoc' => true,
+        'no_useless_else' => true,
+        'no_closing_tag' => true,
+        'single_quote' => true,
+        'phpdoc_order' => true,
+        'self_accessor' => true,
+        'encoding' => true,
+        'elseif' => true
+    ])
+    ->setFinder($finder);
+
+return $config;
