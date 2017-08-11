@@ -2,9 +2,9 @@
 
 require realpath(__DIR__ . '/../vendor/autoload.php');
 
+use Nextform\Config\XmlConfig;
 use Nextform\FileHandler\FileHandler;
 use Nextform\Renderer\Renderer;
-use Nextform\Config\XmlConfig;
 
 $form = new XmlConfig('
     <form name="form2" method="POST" enctype="multipart/form-data">
@@ -26,7 +26,7 @@ $form = new XmlConfig('
     </form>
 ', true);
 
-echo "<pre>";
+echo '<pre>';
 
 $formData = array_merge($_POST, $_FILES);
 
@@ -34,6 +34,6 @@ $fileHandler = new FileHandler($form, __DIR__ . '/assets/temp/');
 $fileHandler->handle($formData);
 
 $renderer = new Renderer($form);
-echo $renderer->render()->each(function($chunk){
+echo $renderer->render()->each(function ($chunk) {
     $chunk->wrap('<div>%s</div>');
 });

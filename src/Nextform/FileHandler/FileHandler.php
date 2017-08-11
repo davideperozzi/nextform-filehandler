@@ -42,8 +42,7 @@ class FileHandler
                     sprintf('Temp destination "%s" is not writable', $temp)
                 );
             }
-        }
-        else {
+        } else {
             throw new Exception\TempDestinationNoDirException(
                 'Temp destination is not a valid dir'
             );
@@ -96,8 +95,7 @@ class FileHandler
         foreach ($data as $key => $value) {
             if (is_array($value) && FileHelper::isUploadedFile($value)) {
                 $data[$key] = $this->exchangeFiles($value);
-            }
-            else if (is_array($value)) {
+            } elseif (is_array($value)) {
                 $data[$key] = $this->proccessData($value);
             }
         }
@@ -117,8 +115,7 @@ class FileHandler
 
             if (is_array($value)) {
                 $this->traverseRecursive($value, $callback, $array);
-            }
-            else {
+            } else {
                 $callback($lastChild);
             }
         }
@@ -137,11 +134,10 @@ class FileHandler
 
         foreach ($extract as $extractKey) {
             if (is_array($file[$extractKey])) {
-                $this->traverseRecursive($file[$extractKey], function(&$chunk) use (&$chunks, $extractKey) {
+                $this->traverseRecursive($file[$extractKey], function (&$chunk) use (&$chunks, $extractKey) {
                     $chunks[$extractKey] = &$chunk;
                 });
-            }
-            else {
+            } else {
                 $chunks[$extractKey] = [&$file[$extractKey]];
             }
         }
@@ -169,7 +165,7 @@ class FileHandler
      */
     private function exchangeFiles($file)
     {
-        $this->traverseFileStructure($file, 'tmp_name', ['tmp_name', 'name', 'error'], function($tmpName, $name, $error){
+        $this->traverseFileStructure($file, 'tmp_name', ['tmp_name', 'name', 'error'], function ($tmpName, $name, $error) {
             if ($error == 0) {
                 return $this->moveUploadedFile($tmpName, pathinfo($name, PATHINFO_EXTENSION));
             }
