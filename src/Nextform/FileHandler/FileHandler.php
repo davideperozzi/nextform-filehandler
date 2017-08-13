@@ -89,7 +89,9 @@ class FileHandler
     public function handle(&$data)
     {
         if ($this->isActive($data)) {
-            $data = $this->proccessData($data);
+            $data = $this->proccessData($data, function ($value) {
+                return $this->exchangeFiles($value);
+            });
         }
 
         return false;
@@ -97,15 +99,16 @@ class FileHandler
 
     /**
      * @param array $data
+     * @param callable $callback
      * @return array
      */
-    private function proccessData($data)
+    private function proccessData($data, callable $callback)
     {
         foreach ($data as $key => $value) {
             if (is_array($value) && FileHelper::isUploadedFile($value)) {
-                $data[$key] = $this->exchangeFiles($value);
+                $data[$key] = $callback($value);
             } elseif (is_array($value)) {
-                $data[$key] = $this->proccessData($value);
+                $data[$key] = $this->proccessData($value, $callback);
             }
         }
 
@@ -174,13 +177,22 @@ class FileHandler
      */
     private function exchangeFiles($file)
     {
-        $this->traverseFileStructure($file, 'tmp_name', ['tmp_name', 'name', 'error'], function ($tmpName, $name, $error) {
-            if ($error == 0) {
-                return $this->moveUploadedFile($tmpName, pathinfo($name, PATHINFO_EXTENSION));
-            }
+        $this->traverseFileStructure(
+            $file,
+            'tmp_name',
+            [
+                'tmp_name',
+                'name',
+                'error'
+            ],
+            function ($tmpName, $name, $error) {
+                if ($error == 0) {
+                    return $this->moveUploadedFile($tmpName, pathinfo($name, PATHINFO_EXTENSION));
+                }
 
-            return $tmpName;
-        });
+                return $tmpName;
+            }
+        );
 
         return $file;
     }
@@ -201,6 +213,32 @@ class FileHandler
         }
 
         return $from;
+    }
+
+    /**
+     * @param array $data
+     * @return boolean
+     */
+    public function removeFilesByData($data)
+    {
+        $valid = true;
+
+        $this->proccessData($data, function ($value) use (&$valid) {
+            $this->traverseFileStructure(
+                $value,
+                'tmp_name',
+                [
+                    'tmp_name'
+                ],
+                function ($tmpName) use (&$valid) {
+                    if ( ! @unlink($tmpName)) {
+                        $valie = false;
+                    }
+                }
+            );
+        });
+
+        return $valid;
     }
 
     /**
