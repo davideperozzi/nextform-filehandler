@@ -30,6 +30,24 @@ class FileHandler
     private $temp = '';
 
     /**
+     * @var string
+     */
+    private $defaultErrorMessage = 'Something went wrong';
+
+    /**
+     * @var array
+     */
+    private $errorMessages = [
+        UPLOAD_ERR_INI_SIZE => 'The uploaded file is too big',
+        UPLOAD_ERR_FORM_SIZE => 'The uploaded file is too big',
+        UPLOAD_ERR_PARTIAL => 'The fiel could not be uploaded completely',
+        UPLOAD_ERR_NO_FILE => 'No file was uploaded',
+        UPLOAD_ERR_NO_TMP_DIR => 'No tmp dir found to upload the file to',
+        UPLOAD_ERR_CANT_WRITE => 'The uploaded file could not be written',
+        UPLOAD_ERR_EXTENSION => 'A PHP extension prevented the upload'
+    ];
+
+    /**
      * @param AbstractConfig $form
      * @param string $temp
      * @param integer $lifetime (seconds, 12h default)
@@ -84,13 +102,14 @@ class FileHandler
 
     /**
      * @param array $data
+     * @param callable $errorCallback
      * @return boolean
      */
-    public function handle(&$data)
+    public function handle(&$data, callable $errorCallback = null)
     {
         if ($this->isActive($data)) {
-            $data = $this->proccessData($data, function ($value) {
-                return $this->exchangeFiles($value);
+            $data = $this->proccessData($data, function ($value) use (&$errorCallback) {
+                return $this->exchangeFiles($value, $errorCallback);
             });
         }
 
@@ -173,9 +192,10 @@ class FileHandler
 
     /**
      * @param array
+     * @param callable $errorCallback
      * @return array
      */
-    private function exchangeFiles($file)
+    private function exchangeFiles($file, callable $errorCallback = null)
     {
         $this->traverseFileStructure(
             $file,
@@ -185,9 +205,17 @@ class FileHandler
                 'name',
                 'error'
             ],
-            function ($tmpName, $name, $error) {
+            function ($tmpName, $name, $error) use (&$errorCallback) {
                 if ($error == 0) {
-                    return $this->moveUploadedFile($tmpName, pathinfo($name, PATHINFO_EXTENSION));
+                    if ($this->moveUploadedFile($tmpName, pathinfo($name, PATHINFO_EXTENSION)) == $tmpName) {
+                        if (is_callable($errorCallback)) {
+                            $errorCallback($name, -1);
+                        }
+                    }
+                } else {
+                    if (is_callable($errorCallback)) {
+                        $errorCallback($name, $error);
+                    }
                 }
 
                 return $tmpName;
@@ -239,6 +267,36 @@ class FileHandler
         });
 
         return $valid;
+    }
+
+    /**
+     * @param integer $code
+     * @return string
+     */
+    public function getErrorMessage($code)
+    {
+        if (array_key_exists($code, $this->errorMessages)) {
+            return $this->errorMessages[$code];
+        }
+
+        return $this->defaultErrorMessage;
+    }
+
+    /**
+     * @param integer $code
+     * @param string $message
+     */
+    public function setErrorMessage($code, $message)
+    {
+        $this->setErrorMessage[$code] = $message;
+    }
+
+    /**
+     * @param string $message
+     */
+    public function setDefaultErrorMessage($message)
+    {
+        $this->defaultErrorMessage = $message;
     }
 
     /**
