@@ -108,7 +108,7 @@ class FileHandler
     public function handle(&$data, callable $errorCallback = null)
     {
         if ($this->isActive($data)) {
-            $data = $this->proccessData($data, function ($value) use (&$errorCallback) {
+            $data = $this->proccessData($data, function (&$value) use (&$errorCallback) {
                 return $this->exchangeFiles($value, $errorCallback);
             });
         }
@@ -121,7 +121,7 @@ class FileHandler
      * @param callable $callback
      * @return array
      */
-    private function proccessData($data, callable $callback)
+    private function proccessData(&$data, callable $callback)
     {
         foreach ($data as $key => $value) {
             if (is_array($value) && FileHelper::isUploadedFile($value)) {
@@ -195,7 +195,7 @@ class FileHandler
      * @param callable $errorCallback
      * @return array
      */
-    private function exchangeFiles($file, callable $errorCallback = null)
+    private function exchangeFiles(&$file, callable $errorCallback = null)
     {
         $this->traverseFileStructure(
             $file,
@@ -207,10 +207,14 @@ class FileHandler
             ],
             function ($tmpName, $name, $error) use (&$errorCallback) {
                 if ($error == 0) {
-                    if ($this->moveUploadedFile($tmpName, pathinfo($name, PATHINFO_EXTENSION)) == $tmpName) {
+                    $movedFile = $this->moveUploadedFile($tmpName, pathinfo($name, PATHINFO_EXTENSION));
+
+                    if ($movedFile == $tmpName) {
                         if (is_callable($errorCallback)) {
                             $errorCallback($name, -1);
                         }
+                    } else {
+                        return $movedFile;
                     }
                 } else {
                     if (is_callable($errorCallback)) {
