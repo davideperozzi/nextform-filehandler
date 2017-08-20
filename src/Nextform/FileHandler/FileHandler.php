@@ -165,9 +165,12 @@ class FileHandler
 
         foreach ($extract as $extractKey) {
             if (is_array($file[$extractKey])) {
-                $this->traverseRecursive($file[$extractKey], function (&$chunk) use (&$chunks, $extractKey) {
-                    $chunks[$extractKey] = &$chunk;
-                });
+                $this->traverseRecursive(
+                    $file[$extractKey],
+                    function (&$chunk) use (&$chunks, $extractKey) {
+                        $chunks[$extractKey] = &$chunk;
+                    }
+                );
             } else {
                 $chunks[$extractKey] = [&$file[$extractKey]];
             }
@@ -264,13 +267,36 @@ class FileHandler
                 ],
                 function ($tmpName) use (&$valid) {
                     if ( ! @unlink($tmpName)) {
-                        $valie = false;
+                        $valid = false;
                     }
                 }
             );
         });
 
         return $valid;
+    }
+
+    /**
+     * @param array &$data
+     * @param array $keys
+     * @return array
+     */
+    public function extractFileDataByKey($data, $key)
+    {
+        $extractedData = [];
+
+        $this->proccessData($data, function ($value) use (&$extractedData, $key) {
+            $this->traverseFileStructure(
+                $value,
+                $key,
+                [$key],
+                function ($foundValue) use (&$extractedData) {
+                    $extractedData[] = $foundValue;
+                }
+            );
+        });
+
+        return $extractedData;
     }
 
     /**
