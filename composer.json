@@ -18,7 +18,7 @@
         "phpunit/phpunit": "~5.7",
         "friendsofphp/php-cs-fixer": "^2.4",
         "brainmaestro/composer-git-hooks": "^2.2",
-        "davideperozzi/nextform-renderer": "^1.0"
+        "davideperozzi/nextform-renderer": "dev-dev"
     },
      "extra": {
         "hooks": {
@@ -31,8 +31,8 @@
         "post-update-cmd": "php ./vendor/bin/cghooks update"
     },
     "require": {
-        "davideperozzi/nextform-config": "^1.0",
-        "davideperozzi/nextform-validator": "^1.0",
-        "davideperozzi/nextform-helpers": "^1.0"
+        "davideperozzi/nextform-config": "dev-dev",
+        "davideperozzi/nextform-validator": "dev-dev",
+        "davideperozzi/nextform-helpers": "dev-dev"
     }
 }
